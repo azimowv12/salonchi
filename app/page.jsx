@@ -1,26 +1,21 @@
-import Aksiya from '@/components/Home/aksiya'
-import Cheap from '@/components/Home/cheap'
-import Fenlar from '@/components/Home/Fenlar'
+import Footer from '@/components/Footer'
 import Hero from '@/components/Home/hero'
-import Qaychilar from '@/components/Home/Qaychi'
-import Soch from '@/components/Home/Soch'
 import Swipper from '@/components/Home/Swipper'
-import Yangiliklar from '@/components/Home/Yangiliklar'
+import Navbar from '@/components/Navbar'
+import NavbarTop from '@/components/navbarTop'
 import Product from '@/components/Product'
 import React from 'react'
 
 export default function App() {
   return (
-    <div className='bg-[#F7F7F7]'>
-      <Product/>
-       <Swipper/>
-      <Hero/>
-      <Cheap/>
-      <Aksiya/>
-      <Yangiliklar/>
-      <Qaychilar/>
-      <Fenlar/>
-      <Soch/>
+    <div className=''>
+      <div className="bg-[#F7F7F7]">
+        {/* <Product /> */}
+        <Swipper />
+        <Hero />
+      </div>
+     
+      
     </div>
   )
 }

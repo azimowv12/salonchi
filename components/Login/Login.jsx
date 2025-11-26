@@ -1,141 +1,152 @@
 "use client";
+import React, { useState } from 'react';
 
-import { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+function Login() {
+  const [isLogin, setIsLogin] = useState(true);
+  const [user, setUser] = useState(null);
 
-export default function RegisterPage() {
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
+  const switchMode = () => {
+    setIsLogin(!isLogin);
+  };
 
+  const handleAuth = (userData) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+  };
+
+  if (user) {
     return (
-        <main className="min-h-screen flex flex-col mt-10 items-center justify-center bg-gray-50 px-4">
-            <div className="mb-8">
-                <h1 className="text-orange-500 text-left text-3xl font-bold tracking-wide">
-                    Salonchi
-                </h1>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Xush kelibsiz!</h2>
+            <p className="text-gray-600 mb-6">Siz tizimga kirdingiz</p>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <p className="text-green-800 font-medium">{user.email}</p>
             </div>
-
-            <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
-                <h2 className="text-center text-2xl font-semibold mb-2">
-                    Ro’yxatdan o’tish
-                </h2>
-                <p className="text-center text-gray-500 text-sm mb-8">
-                    Ro’yxatdan o’tish uchun quyidagi ma’lumotlarni to’ldiring
-                </p>
-
-                <form className="space-y-5">
-                    <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block">
-                            Familiya va ism
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="Familiya va ismingizni kiriting"
-                            className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500"
-                        />
-                    </div>
-
-                    {/* Telefon raqam */}
-                    <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block">
-                            Telefon raqami
-                        </label>
-                        <input
-                            type="tel"
-                            placeholder="+998"
-                            className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500"
-                        />
-                    </div>
-
-                    {/* Parol */}
-                    <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block">
-                            Parol
-                        </label>
-                        <div className="relative">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                placeholder="Parol yarating"
-                                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
-                            >
-                                {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Parolni tasdiqlash */}
-                    <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block">
-                            Parolni tasdiqlang
-                        </label>
-                        <div className="relative">
-                            <input
-                                type={showConfirm ? "text" : "password"}
-                                placeholder="Parolni tasdiqlang"
-                                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowConfirm(!showConfirm)}
-                                className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
-                            >
-                                {showConfirm ? (
-                                    <FaEyeSlash size={18} />
-                                ) : (
-                                    <FaEye size={18} />
-                                )}
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Viloyat */}
-                    <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block">
-                            Viloyat
-                        </label>
-                        <select className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 text-gray-700">
-                            <option value="">Viloyatingizni tanlang</option>
-                            <option>Toshkent</option>
-                            <option>Andijon</option>
-                            <option>Buxoro</option>
-                            <option>Farg‘ona</option>
-                            <option>Namangan</option>
-                            <option>Navoiy</option>
-                            <option>Qashqadaryo</option>
-                            <option>Samarqand</option>
-                            <option>Surxondaryo</option>
-                            <option>Sirdaryo</option>
-                            <option>Jizzax</option>
-                            <option>Xorazm</option>
-                            <option>Qoraqalpog‘iston</option>
-                        </select>
-                    </div>
-
-                    {/* Submit */}
-                    <button
-                        type="submit"
-                        className="w-full bg-orange-500 text-white rounded-xl py-3 font-medium hover:bg-orange-600 transition"
-                    >
-                        Ro’yxatdan o’tish
-                    </button>
-                </form>
-
-                {/* Kirish link */}
-                <p className="text-center text-sm text-gray-600 mt-6">
-                    Siz avval ro’yxatdan o’tganmisiz?{" "}
-                    <a
-                        href="/login"
-                        className="text-orange-500 hover:underline font-medium"
-                    >
-                        Kirish
-                    </a>
-                </p>
-            </div>
-        </main>
+            <button
+              onClick={handleLogout}
+              className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-4 rounded-lg transition duration-200"
+            >
+              Chiqish
+            </button>
+          </div>
+        </div>
+      </div>
     );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            {isLogin ? 'Tizimga kirish' : 'Roʻyxatdan oʻtish'}
+          </h1>
+          <p className="text-gray-600">
+            {isLogin ? 'Hisobingizga kiring' : 'Yangi hisob yarating'}
+          </p>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          const data = Object.fromEntries(formData);
+          handleAuth(data);
+        }}>
+          {!isLogin && (
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                Ism
+              </label>
+              <input
+                type="text"
+                name="name"
+                required={!isLogin}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
+                placeholder="Ismingizni kiriting"
+              />
+            </div>
+          )}
+
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-medium mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
+              placeholder="email@example.com"
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm font-medium mb-2">
+              Parol
+            </label>
+            <input
+              type="password"
+              name="password"
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
+              placeholder="Parolingizni kiriting"
+            />
+          </div>
+
+          {!isLogin && (
+            <div className="mb-6">
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                Parolni tasdiqlang
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                required={!isLogin}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
+                placeholder="Parolni qayta kiriting"
+              />
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-lg transition duration-200 mb-4"
+          >
+            {isLogin ? 'Kirish' : 'Roʻyxatdan oʻtish'}
+          </button>
+        </form>
+
+        {/* Switch mode */}
+        <div className="text-center">
+          <p className="text-gray-600">
+            {isLogin ? 'Hisobingiz yoʻqmi?' : 'Allaqachon hisobingiz bormi?'}
+            <button
+              onClick={switchMode}
+              className="ml-2 text-blue-500 hover:text-blue-600 font-medium transition duration-200"
+            >
+              {isLogin ? 'Roʻyxatdan oʻting' : 'Tizimga kiring'}
+            </button>
+          </p>
+        </div>
+
+        {/* Additional links */}
+        {isLogin && (
+          <div className="text-center mt-4">
+            <button className="text-sm text-gray-500 hover:text-gray-700 transition duration-200">
+              Parolni unutdingizmi?
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
+
+export default Login;
