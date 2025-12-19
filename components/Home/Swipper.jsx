@@ -11,7 +11,7 @@ import { Navigation } from 'swiper/modules';
 export default function Swipper() {
     return (
         <>
-            <Swiper navigation={true} modules={[Navigation]} className="mySwiper   max-w-7xl h-[400px]  mx-auto rounded-[35px] mt-10 ">
+            <Swiper navigation={true} modules={[Navigation]} className="mySwiper   max-w-7xl h-[400px]  mx-auto rounded-[35px] pt-20 ">
                 <SwiperSlide>
                     <img src="/swiper.png" alt="Swiper"  />
                 </SwiperSlide>

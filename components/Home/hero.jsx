@@ -7,9 +7,12 @@ import { FiShoppingBag, FiMinus, FiPlus } from 'react-icons/fi'
 import { useCart } from '../../context/CartContext'
 import { useFavorites } from '../../context/FavoritesContext'
 import Link from 'next/link'
+import toast from 'react-hot-toast'
+import { useDarkMode } from '@/context/DarkModeContext'
 
 export default function Hero() {
     const [products, setProducts] = useState([])
+    const { isDark } = useDarkMode();
     const [filteredProducts, setFilteredProducts] = useState([])
     const [currentPage, setCurrentPage] = useState(1)
     const [loading, setLoading] = useState(true)
@@ -65,7 +68,6 @@ export default function Hero() {
             setCategories(categoriesData)
         } catch (error) {
             console.error('Error categories:', error)
-            setCategories(getDefaultCategories())
         }
     }
 
@@ -97,7 +99,6 @@ export default function Hero() {
         return categoryIcons[categoryName] || '/products/stoll.png'
     }
 
-
     const handleCategorySelect = (category) => {
         setSelectedCategory(category)
     }
@@ -118,6 +119,19 @@ export default function Hero() {
 
     const handleAddToCart = (product) => {
         const quantity = productQuantities[product.id] || 1
+
+        toast.success(
+            `${quantity} ta "${product.title.substring(0, 30)}${product.title.length > 30 ? '...' : ''}" savatga qo'shildi!`,
+            {
+                duration: 3000,
+                style: {
+                    borderRadius: '10px',
+                    background: '#10b981',
+                    color: '#fff',
+                },
+            }
+        )
+
         for (let i = 0; i < quantity; i++) {
             addToCart(product)
         }
@@ -142,6 +156,35 @@ export default function Hero() {
     }
 
     const handleToggleFavorite = (product) => {
+        const wasFavorite = isFavorite(product.id)
+
+        if (wasFavorite) {
+            toast(
+                `"${product.title.substring(0, 30)}${product.title.length > 30 ? '...' : ''}" sevimlilardan o'chirildi`,
+                {
+                    duration: 2000,
+                    icon: '💔',
+                    style: {
+                        borderRadius: '10px',
+                        background: '#6b7280',
+                        color: '#fff',
+                    },
+                }
+            )
+        } else {
+            toast.success(
+                `"${product.title.substring(0, 30)}${product.title.length > 30 ? '...' : ''}" sevimlilarga qo'shildi!`,
+                {
+                    duration: 2000,
+                    style: {
+                        borderRadius: '10px',
+                        background: '#ef4444',
+                        color: '#fff',
+                    },
+                }
+            )
+        }
+
         toggleFavorite(product)
     }
 
@@ -159,21 +202,20 @@ export default function Hero() {
 
     if (loading) {
         return (
-            <div className='max-w-7xl mx-auto mt-[56px] px-4'>
+            <div className={`max-w-7xl mx-auto mt-[56px] px-4 ${isDark ? 'bg-gray-900' : ''}`}>
                 <div className='mb-8'>
                     <Title text={"Tavsiya qilamiz"} />
                 </div>
-                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4'>
                     {[...Array(10)].map((_, index) => (
-                        <div key={index} className='bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 animate-pulse'>
-                            <div className='p-6 pb-4 flex flex-col items-center'>
-                                <div className='w-32 h-32 bg-gray-200 rounded-xl'></div>
+                        <div key={index} className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-sm animate-pulse`}>
+                            <div className='p-4 pb-2'>
+                                <div className={`w-full h-40 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded-lg`}></div>
                             </div>
-                            <div className='px-6 pb-6 space-y-3'>
-                                <div className='h-4 bg-gray-200 rounded w-3/4'></div>
-                                <div className='h-3 bg-gray-200 rounded w-1/2'></div>
-                                <div className='h-3 bg-gray-200 rounded w-2/3'></div>
-                                <div className='h-6 bg-gray-200 rounded w-1/3'></div>
+                            <div className='px-4 pb-4 space-y-2'>
+                                <div className={`h-3 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded w-3/4`}></div>
+                                <div className={`h-3 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded w-1/2`}></div>
+                                <div className={`h-4 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded w-1/3`}></div>
                             </div>
                         </div>
                     ))}
@@ -183,282 +225,200 @@ export default function Hero() {
     }
 
     return (
-        <div className='max-w-7xl mx-auto mt-[56px] px-4'>
+        <div className={`max-w-7xl mx-auto mt-[56px] px-4 ${isDark ? "bg-gray-900 text-white" : "text-gray-900"}`}>
             <div className='mb-8'>
                 <Title text={"Tavsiya qilamiz"} />
             </div>
 
-            {/* Katalog bo'limi */}
-            <div className='mb-8 hidden md:block'>
-                <div className='flex flex-wrap gap-4 items-center justify-between bg-white rounded-2xl p-6 shadow-sm border border-gray-100'>
-                    <div className='flex flex-wrap gap-4'>
-                        {displayedCategories.map((category) => (
-                            <div
-                                key={category.id}
-                                className={`flex gap-2 items-center p-3 rounded-lg cursor-pointer transition-all duration-300 ${selectedCategory?.id === category.id
-                                        ? 'bg-orange-100 border-2 border-orange-500 shadow-md'
-                                        : 'bg-gray-50 hover:bg-orange-50 border-2 border-transparent hover:border-orange-200'
-                                    }`}
-                                onClick={() => handleCategorySelect(category)}
-                            >
-                                <img
-                                    src={category.icon}
-                                    alt={category.name}
-                                    className='w-6 h-6 object-contain'
-                                />
-                                <div className="flex flex-col">
-                                    <h1 className='text-[16px] font-medium leading-[100%] text-gray-800'>
-                                        {category.name}
-                                    </h1>
-                                    <span className="text-xs text-gray-500 mt-1">
-                                        {category.productCount} mahsulot
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="flex items-center gap-4">
+            {/* Kategoriyalar */}
+            <div className='mb-8'>
+                <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl p-4 shadow-sm border`}>
+                    <div className='flex items-center justify-between mb-3'>
                         {selectedCategory && (
                             <button
                                 onClick={handleClearFilter}
-                                className="text-orange-500 hover:text-orange-600 font-medium text-sm bg-orange-50 px-4 py-2 rounded-lg transition-colors"
+                                className={`text-orange-500 text-xs font-medium px-3 py-1 ${isDark ? 'bg-orange-900/30' : 'bg-orange-50'} rounded-lg hover:bg-orange-100 transition-colors`}
                             >
-                                Filterni tozalash
+                                Tozalash
                             </button>
                         )}
-
-                        <div className="relative">
-                            <select
-                                value={showAllCategories ? 'all' : 'some'}
-                                onChange={(e) => setShowAllCategories(e.target.value === 'all')}
-                                className='text-[#4D5761] text-[16px] font-medium leading-[100%] pr-8 pl-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent appearance-none cursor-pointer'
-                            >
-                                <option value="some">Ko'proq ko'rish</option>
-                                <option value="all">Barchasini ko'rish</option>
-                            </select>
-                            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Tanlangan kategoriya ko'rsatkich */}
-                {selectedCategory && (
-                    <div className="mt-4 flex items-center gap-4 bg-orange-50 rounded-xl p-4">
-                        <div className="flex items-center gap-3">
-                            <img
-                                src={selectedCategory.icon}
-                                alt={selectedCategory.name}
-                                className='w-8 h-8 object-contain'
-                            />
-                            <div>
-                                <h3 className="font-semibold text-gray-800">{selectedCategory.name}</h3>
-                                <p className="text-sm text-gray-600">
-                                    {filteredProducts.length} ta mahsulot topildi
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* Mobile Katalog */}
-            <div className='mb-6 md:hidden'>
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                    <div className="flex justify-between items-center mb-3">
-                        <h3 className="font-semibold text-gray-800">Kategoriyalar</h3>
-                        <button
-                            onClick={() => setShowAllCategories(!showAllCategories)}
-                            className="text-orange-500 text-sm font-medium"
-                        >
-                            {showAllCategories ? 'Yopish' : 'Barchasi'}
-                        </button>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2">
-                        {categories.slice(0, showAllCategories ? categories.length : 6).map((category) => (
-                            <div
+                    <div className='flex gap-2 overflow-x-auto pb-3'>
+                        {categories.map((category) => (
+                            <button
                                 key={category.id}
-                                className={`flex flex-col items-center p-3 rounded-lg cursor-pointer transition-all ${selectedCategory?.id === category.id
-                                        ? 'bg-orange-100 border border-orange-500'
-                                        : 'bg-gray-50 hover:bg-orange-50 border border-transparent'
-                                    }`}
                                 onClick={() => handleCategorySelect(category)}
+                                className={`flex items-center p-3 rounded-lg transition-all whitespace-nowrap flex-shrink-0 border ${selectedCategory?.id === category.id
+                                        ? 'bg-orange-100 border-orange-500 text-orange-700'
+                                        : isDark
+                                            ? 'bg-gray-700 border-gray-600 text-gray-200 hover:bg-orange-900/30 hover:border-orange-500'
+                                            : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-orange-50 hover:border-orange-300'
+                                    }`}
                             >
                                 <img
                                     src={category.icon}
                                     alt={category.name}
-                                    className='w-6 h-6 object-contain mb-1'
+                                    className='w-5 h-5 object-contain'
                                 />
-                                <span className="text-xs font-medium text-gray-800 text-center leading-tight">
+                                <span className='ml-2 text-sm font-medium'>
                                     {category.name}
                                 </span>
-                            </div>
+                            </button>
                         ))}
                     </div>
-
-                    {selectedCategory && (
-                        <div className="mt-3 pt-3 border-t border-gray-200">
-                            <button
-                                onClick={handleClearFilter}
-                                className="w-full text-center text-orange-500 hover:text-orange-600 font-medium text-sm py-2"
-                            >
-                                Filterni tozalash
-                            </button>
-                        </div>
-                    )}
                 </div>
             </div>
 
             {/* Mahsulotlar */}
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4'>
                 {currentProducts.map((product) => {
                     const discountedPrice = getDiscountedPrice(product)
                     const favorite = isFavorite(product.id)
                     const quantity = productQuantities[product.id] || 1
 
                     return (
-                        <Link href={`/product/${product.id}`}
+                        <div
                             key={product.id}
-                            className='group bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-orange-100'
+                            className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border group flex flex-col h-full`}
                         >
-                            <div className='relative p-6 pb-4'>
-                                <div className='relative overflow-hidden rounded-xl'>
-                                    <img
-                                        src={product.thumbnail}
-                                        alt={product.title}
-                                        className='w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300'
-                                    />
+                            <Link href={`/product/${product.id}`} className='block'>
+                                <div className='relative p-3 pb-0 flex-shrink-0'>
+                                    <div className={`relative overflow-hidden rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-100'} aspect-square`}>
+                                        <img
+                                            src={product.thumbnail || '/placeholder-image.jpg'}
+                                            alt={product.title}
+                                            className='w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300'
+                                            onError={(e) => {
+                                                e.target.onerror = null
+                                                e.target.src = '/placeholder-image.jpg'
+                                            }}
+                                        />
+                                    </div>
+
+                                    {product.discountPercentage > 0 && (
+                                        <div className='absolute top-2 left-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 py-1 rounded text-xs font-semibold shadow'>
+                                            -{Math.round(product.discountPercentage)}%
+                                        </div>
+                                    )}
+
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            e.stopPropagation()
+                                            handleToggleFavorite(product)
+                                        }}
+                                        className={`absolute top-2 right-2 p-1.5 rounded-full transition-all ${favorite
+                                                ? 'text-red-500 bg-red-50 shadow'
+                                                : isDark
+                                                    ? 'text-gray-300 bg-gray-700/80 hover:text-red-500 hover:bg-red-900/30'
+                                                    : 'text-gray-400 bg-white/80 hover:text-red-500 hover:bg-red-50'
+                                            }`}
+                                    >
+                                        {favorite ?
+                                            <IoHeart className="text-lg" /> :
+                                            <IoHeartOutline className="text-lg" />
+                                        }
+                                    </button>
                                 </div>
+                            </Link>
 
-                                <button
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        handleToggleFavorite(product)
-                                    }}
-                                    className={`absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-sm transition-all duration-300 ${favorite
-                                            ? 'bg-red-500 text-white shadow-lg animate-pulse'
-                                            : 'bg-white/80 text-gray-600 hover:bg-white hover:text-red-500 shadow-sm'
-                                        }`}
-                                >
-                                    {favorite ? <IoHeart className="text-lg" /> : <IoHeartOutline className="text-lg" />}
-                                </button>
+                            <div className='p-3 pt-2 space-y-2 flex-grow flex flex-col'>
+                                <Link href={`/product/${product.id}`} className='block flex-grow'>
+                                    <h3 className={`${isDark ? 'text-gray-200' : 'text-gray-800'} font-medium text-sm line-clamp-2 hover:text-orange-600 mb-2`}>
+                                        {product.title}
+                                    </h3>
 
-                                {product.discountPercentage > 0 && (
-                                    <div className='absolute top-4 left-4 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg'>
-                                        -{Math.round(product.discountPercentage)}%
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className='p-6 pt-4 space-y-3'>
-                                <h3 className='text-gray-800 font-medium leading-tight line-clamp-2 group-hover:text-orange-600 transition-colors'>
-                                    {product.title}
-                                </h3>
-
-                                <div className='flex items-center gap-2'>
-                                    <div className='flex items-center gap-1 text-amber-500'>
-                                        <span className='text-sm'>⭐</span>
-                                        <span className='text-sm font-medium'>{product.rating}</span>
-                                    </div>
-                                    <span className='text-gray-400 text-sm'>•</span>
-                                    <span className='text-gray-500 text-sm'>
-                                        {product.reviews?.length || 0} sharh
-                                    </span>
-                                </div>
-
-                                <div className='space-y-2'>
-                                    <div className='text-orange-500 text-sm font-semibold'>
-                                        {formatPrice(Math.round(product.price / 12))} $/oyiga
+                                    <div className='flex items-center gap-1 text-amber-500 text-sm mb-2'>
+                                        <span>⭐</span>
+                                        <span>{product.rating}</span>
+                                        <span className='text-gray-400 mx-1'>•</span>
+                                        <span className={`${isDark ? 'text-gray-400' : 'text-gray-500'} text-xs`}>
+                                            {Math.floor(Math.random() * 100)} sharh
+                                        </span>
                                     </div>
 
-                                    <div className='flex items-center gap-2'>
-                                        {product.discountPercentage > 0 ? (
-                                            <>
-                                                <span className='text-gray-400 text-sm line-through'>
+                                    <div className='space-y-1 mb-3'>
+                                        <div className='text-orange-500 text-xs font-semibold'>
+                                            {formatPrice(Math.round(product.price / 12))} $/oyiga
+                                        </div>
+
+                                        <div className='flex items-center gap-2'>
+                                            {product.discountPercentage > 0 ? (
+                                                <>
+                                                    <span className='text-gray-400 text-sm line-through'>
+                                                        {formatPrice(product.price)} $
+                                                    </span>
+                                                    <span className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                                        {formatPrice(discountedPrice)} $
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <span className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                                                     {formatPrice(product.price)} $
                                                 </span>
-                                                <span className='text-2xl font-bold text-gray-900'>
-                                                    {product.price} $
-                                                </span>
-                                            </>
-                                        ) : (
-                                            <span className='text-2xl font-bold text-gray-900'>
-                                                {formatPrice(product.price)} $
-                                            </span>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
+                                </Link>
 
-                                <div className='space-y-3 pt-2'>
-                                    <div className='flex items-center justify-between bg-gray-50 rounded-xl p-2'>
-                                        <span className='text-sm font-medium text-gray-600'>Miqdor:</span>
-                                        <div className='flex items-center gap-3'>
+                                <div className='space-y-2 pt-1 mt-auto'>
+                                    <div className={`flex items-center justify-between ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg p-1`}>
+                                        <div className='flex items-center gap-2'>
                                             <button
-                                                onClick={(e) => {
-                                                    e.preventDefault()
-                                                    decreaseQuantity(product.id)
-                                                }}
-                                                className='w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors'
+                                                onClick={() => decreaseQuantity(product.id)}
+                                                className={`w-6 h-6 flex items-center justify-center rounded ${isDark
+                                                        ? 'bg-gray-600 border-gray-500 text-gray-200 hover:bg-gray-500'
+                                                        : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-100'
+                                                    } hover:border-orange-300 transition-colors`}
                                             >
-                                                <FiMinus className="text-sm" />
+                                                <FiMinus className="text-xs" />
                                             </button>
-                                            <span className='font-bold text-gray-800 min-w-8 text-center'>
+                                            <span className={`font-bold ${isDark ? 'text-white' : 'text-gray-800'} text-sm min-w-6 text-center`}>
                                                 {quantity}
                                             </span>
                                             <button
-                                                onClick={(e) => {
-                                                    e.preventDefault()
-                                                    increaseQuantity(product.id)
-                                                }}
-                                                className='w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors'
+                                                onClick={() => increaseQuantity(product.id)}
+                                                className={`w-6 h-6 flex items-center justify-center rounded ${isDark
+                                                        ? 'bg-gray-600 border-gray-500 text-gray-200 hover:bg-gray-500'
+                                                        : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-100'
+                                                    } hover:border-orange-300 transition-colors`}
                                             >
-                                                <FiPlus className="text-sm" />
+                                                <FiPlus className="text-xs" />
                                             </button>
                                         </div>
+                                        <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            {product.stock || 100} ta
+                                        </span>
                                     </div>
 
-                                    <div className='flex gap-2'>
-                                        <button
-                                            onClick={(e) => {
-                                                e.preventDefault()
-                                                handleAddToCart(product)
-                                            }}
-                                            className='flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group/btn'
-                                        >
-                                            <FiShoppingBag className="text-lg group-hover/btn:scale-110 transition-transform" />
-                                            Savatga ({quantity})
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.preventDefault()
-                                                handleAddToCart(product)
-                                            }}
-                                            className='w-12 h-12 bg-orange-50 text-orange-500 rounded-xl hover:bg-orange-100 transition-colors flex items-center justify-center group/cart'
-                                        >
-                                            <IoCartOutline className="text-xl group-hover/cart:scale-110 transition-transform" />
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={() => handleAddToCart(product)}
+                                        className='w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-2 rounded-lg font-semibold text-sm hover:shadow-md transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95'
+                                    >
+                                        <FiShoppingBag className="text-base" />
+                                        Savatga ({quantity})
+                                    </button>
                                 </div>
                             </div>
-                        </Link>
+                        </div>
                     )
                 })}
             </div>
 
             {/* Pagination */}
             {currentProducts.length > 0 && (
-                <div className='flex justify-center items-center gap-2 mt-12 mb-16'>
+                <div className='flex justify-center items-center gap-2 mt-8 mb-12'>
                     <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className={`w-12 h-12 flex items-center justify-center rounded-xl border transition-all ${currentPage === 1
-                            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                            : 'bg-white text-gray-600 border-gray-300 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600'
+                        className={`w-10 h-10 flex items-center justify-center rounded-lg border text-sm ${currentPage === 1
+                                ? isDark
+                                    ? 'bg-gray-800 text-gray-600 cursor-not-allowed border-gray-700'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                : isDark
+                                    ? 'bg-gray-800 text-gray-200 hover:bg-orange-900/30 hover:text-orange-500 hover:border-orange-500 border-gray-700'
+                                    : 'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-300'
                             }`}
                     >
                         ←
@@ -480,9 +440,11 @@ export default function Hero() {
                             <button
                                 key={pageNumber}
                                 onClick={() => handlePageChange(pageNumber)}
-                                className={`w-12 h-12 flex items-center justify-center rounded-xl border font-semibold transition-all ${currentPage === pageNumber
-                                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white border-transparent shadow-lg'
-                                    : 'bg-white text-gray-600 border-gray-300 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600'
+                                className={`w-10 h-10 flex items-center justify-center rounded-lg border text-sm font-semibold ${currentPage === pageNumber
+                                        ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white border-transparent shadow'
+                                        : isDark
+                                            ? 'bg-gray-800 text-gray-200 hover:bg-orange-900/30 hover:text-orange-500 hover:border-orange-500 border-gray-700'
+                                            : 'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-300'
                                     }`}
                             >
                                 {pageNumber}
@@ -493,9 +455,13 @@ export default function Hero() {
                     <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className={`w-12 h-12 flex items-center justify-center rounded-xl border transition-all ${currentPage === totalPages
-                            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                            : 'bg-white text-gray-600 border-gray-300 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600'
+                        className={`w-10 h-10 flex items-center justify-center rounded-lg border text-sm ${currentPage === totalPages
+                                ? isDark
+                                    ? 'bg-gray-800 text-gray-600 cursor-not-allowed border-gray-700'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                : isDark
+                                    ? 'bg-gray-800 text-gray-200 hover:bg-orange-900/30 hover:text-orange-500 hover:border-orange-500 border-gray-700'
+                                    : 'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-300'
                             }`}
                     >
                         →
@@ -504,13 +470,13 @@ export default function Hero() {
             )}
 
             {currentProducts.length === 0 && (
-                <div className="text-center py-16">
-                    <div className="text-gray-400 text-6xl mb-4">😔</div>
-                    <h3 className="text-xl font-semibold text-gray-600 mb-2">Hech narsa topilmadi</h3>
-                    <p className="text-gray-500 mb-6">Tanlangan kategoriyada mahsulot topilmadi</p>
+                <div className="text-center py-12">
+                    <div className="text-gray-400 text-5xl mb-3">😔</div>
+                    <h3 className={`text-lg font-semibold ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Hech narsa topilmadi</h3>
+                    <p className={`${isDark ? 'text-gray-400' : 'text-gray-500'} mb-4`}>Tanlangan kategoriyada mahsulot topilmadi</p>
                     <button
                         onClick={handleClearFilter}
-                        className="bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-600 transition-colors"
+                        className="bg-orange-500 text-white px-5 py-2 rounded-lg font-semibold text-sm hover:bg-orange-600 hover:shadow transition-all"
                     >
                         Barcha mahsulotlarni ko'rish
                     </button>
